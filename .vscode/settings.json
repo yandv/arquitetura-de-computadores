@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "math.h": "c",
+        "xmmintrin.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "malloc.h": "c",
+        "avx2intrin.h": "c",
+        "immintrin.h": "c",
+        "multiply-06c": "c",
+        "identity-05c": "c"
+    },
+    "c-cpp-compile-run.custom-run-prefix": "ubuntu2004 run time",
+    "c-cpp-compile-run.c-flags": "-Wall -Wextra -g3 -O3"
+}
