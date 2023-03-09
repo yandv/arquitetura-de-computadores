@@ -32,6 +32,7 @@ int main(int argc, char const *argv[])
     }
 
     printf("Iniciando as operacoes...\n");
+    int identity = 1;
 
     for (int i = 0; i < size; i++)
     {
@@ -39,7 +40,11 @@ int main(int argc, char const *argv[])
 
         for (int j = 0; j < size; j++)
         {
-            matrix[i][j] = i == j ? 1 : 0;
+            if (identity) {
+                matrix[i][j] = i == j ? 1 : 0;
+            } else {
+                matrix[i][j] = createRandom(10);
+            }
         }
     }
 

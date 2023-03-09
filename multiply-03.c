@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <omp.h>
@@ -13,28 +13,16 @@ int createRandom(int upper)
     return rand() % upper;
 }
 
-int **alloc(int , int);
-int **multiply(int**, int**, int);
+int *transpose(int*, int);
+int *multiply(int*, int*, int);
 
-// MATRIX MULTIPLICATION WITH OPENMP
+
+// VECTOR SIZE X SIZE MULTIPLICATION MATRIX X TRANSPOSE WITH OPENMP
 
 int threads = 1;
 
-void print(int **matrix, int size)
-{
-    for (int i = 0; i < size; i++)
-    {
-        for (int j = 0; j < size; j++)
-        {
-            printf("%d ", matrix[i][j]);
-        }
-        printf("\n");
-    }
-}
-
 int main(int argc, char const *argv[])
 {
-
     if (argc < 2)
     {
         printf("Erro ao abrir o arquivo");
@@ -43,66 +31,69 @@ int main(int argc, char const *argv[])
 
     srand(time(NULL));
     int size = atoi(argv[1]);
-    int **matriz;
-    matriz = alloc(size, size);
 
     if (argc >= 3) {
         threads = atoi(argv[2]);
     }
 
-    omp_set_num_threads(threads);
+    int *matrix = malloc(sizeof(int) * size * size);
 
-    printf("Iniciando operações com %d threads...\n", threads);
-
-    for(int i = 0; i < size; i++)
+    if (matrix == NULL)
     {
-        for(int j = 0; j < size; j++)
+        printf("Erro ao alocar memoria");
+        return 1;
+    }
+
+    printf("Iniciando as operacoes usando %d threads...\n", threads);
+
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
         {
-            matriz[i][j] = createRandom(10);
+            *((matrix + i * size) + j) = createRandom(100);
         }
     }
-    
-    multiply(matriz, matriz, size);
+
+    multiply(matrix, transpose(matrix, size), size);
 
     return 0;
 }
 
-int **multiply(int **first, int **second, int size)
+int* multiply(int* first, int* second, int size)
 {
-    int core = 4, i, j, k;
-    int **matrix = alloc(size, size);
+    int *result = malloc(sizeof(int) * size * size), i, j, k;
 
     #pragma omp parallel for private(i,j,k) 
-	for(i=0;i<size;i++)
-	{
-		for(j=0;j<size;j++)
-		{
-            matrix[i][j] = 0;
+    for (i = 0; i < size; i++)
+    {
+        for (j = 0; j < size; j++)
+        {
+            int sum = 0;
 
-			for(k=0;k<size;k++)
-			{
-                matrix[i][j] += first[i][k] * second[k][j];
-			}
-		}
-	}
+            for (k = 0; k < size; k++)
+            {
+                sum += *(first + i * size + k) * *(second + j * size + k);
+            }
 
-    return matrix;
+            *((result + (i * size)) + j) = sum;
+        }
+    }
+
+    return result;
 }
 
-int **alloc(int linha, int coluna)
+int* transpose(int* matrix, int size)
 {
-    int **matriz = malloc(linha * sizeof(int*));
+    int *transposed = malloc(sizeof(int) * size * size), i, j;
 
-    if(matriz == NULL)
+    #pragma omp parallel for private(i,j) 
+    for (i = 0; i < size; i++)
     {
-        printf("Não foi possível alocar matriz");
-        return 0;
+        for (j = 0; j < size; j++)
+        {
+            *((transposed + (j * size)) + i) = *((matrix + (i * size)) + j);
+        }
     }
 
-    for(int i = 0; i < linha; i++)
-    {
-        matriz[i] = malloc(coluna * sizeof(int*)); 
-    }
-
-    return matriz;
+    return transposed;
 }

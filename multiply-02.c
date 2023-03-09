@@ -1,6 +1,8 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+
+#include <stdlib.h>
 
 #include <time.h>
 
@@ -11,21 +13,28 @@ int createRandom(int upper)
     return rand() % upper;
 }
 
-// MATRIX
-
-int **alloc(int , int);
-int **multiply(int**, int**, int);
-
-void print(int **matrix, int size)
+int *multiply(int *first, int *second, int size)
 {
+    int *matrix = malloc(sizeof(int) * size * size);
+
+    int test[5][5];
+
     for (int i = 0; i < size; i++)
     {
         for (int j = 0; j < size; j++)
         {
-            printf("%d ", matrix[i][j]);
+            int result = 0;
+
+            for (int k = 0; k < size; k++)
+            {
+                result += *((first + (i * size)) + k) * *((second + (k * size)) + j);
+            }
+
+            *((matrix + (i * size)) + j) = result;
         }
-        printf("\n");
     }
+
+    return matrix;
 }
 
 int main(int argc, char const *argv[])
@@ -37,56 +46,25 @@ int main(int argc, char const *argv[])
         return 1;
     }
 
+    srand(time(NULL));
     int size = atoi(argv[1]);
-    int **matriz;
-    matriz = alloc(size, size);
 
-    for(int i = 0; i < size; i++)
+    int *matrix = malloc(sizeof(int) * size * size);
+
+    if (matrix == NULL)
     {
-        for(int j = 0; j < size; j++)
+        printf("Erro ao alocar memoria");
+        return 1;
+    }
+
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
         {
-            matriz[i][j] = createRandom(10);
+            *((matrix + i * size) + j) = createRandom(10);
         }
     }
 
-    multiply(matriz, matriz, size);
+    multiply(matrix, matrix, size);
     return 0;
-}
-
-int **multiply(int **first, int **second, int size)
-{
-    int **matrix = alloc(size, size);
-
-	for(int i=0;i<size;i++)
-	{
-		for(int j=0;j<size;j++)
-		{
-            matrix[i][j] = 0;
-
-			for(int k=0;k<size;k++)
-			{
-                matrix[i][j] += first[i][k] * second[k][j];
-			}
-		}
-	}
-
-    return matrix;
-}
-
-int **alloc(int linha, int coluna)
-{
-    int **matriz = malloc(linha * sizeof(int*));
-
-    if(matriz == NULL)
-    {
-        printf("Não foi possível alocar matriz");
-        return 0;
-    }
-
-    for(int i = 0; i < linha; i++)
-    {
-        matriz[i] = malloc(coluna * sizeof(int*)); 
-    }
-
-    return matriz;
 }
