@@ -15,7 +15,8 @@ int createRandom(int upper)
 
 int *multiply(int *first, int *second, int size)
 {
-    int *matrix = malloc(sizeof(int) * size * size);
+    int *matrix;
+    posix_memalign((void**)&matrix, 32, sizeof(int) * size * size);
 
     int test[5][5];
 
@@ -49,7 +50,8 @@ int main(int argc, char const *argv[])
     srand(time(NULL));
     int size = atoi(argv[1]);
 
-    int *matrix = malloc(sizeof(int) * size * size);
+    int *matrix;
+    posix_memalign((void**)&matrix, 32, sizeof(int) * size * size);
 
     if (matrix == NULL)
     {

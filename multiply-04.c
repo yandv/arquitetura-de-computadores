@@ -36,14 +36,15 @@ int main(int argc, char const *argv[])
         threads = atoi(argv[2]);
     }
 
-    int *matrix;
-    posix_memalign((void**)&matrix, 32, sizeof(int) * size * size);
+    int *matrix = malloc(sizeof(int) * size * size);
 
     if (matrix == NULL)
     {
         printf("Erro ao alocar memoria");
         return 1;
     }
+
+    printf("Iniciando as operacoes usando %d threads...\n", threads);
 
     for (int i = 0; i < size; i++)
     {
@@ -83,8 +84,7 @@ int* multiply(int* first, int* second, int size)
 
 int* transpose(int* matrix, int size)
 {
-    int *transposed, i, j;
-    posix_memalign((void**)&transposed, 32, sizeof(int) * size * size);
+    int *transposed = malloc(sizeof(int) * size * size), i, j;
 
     #pragma omp parallel for private(i,j) 
     for (i = 0; i < size; i++)
